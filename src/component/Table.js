@@ -1,10 +1,9 @@
 import React from "react";
 import DataTable from "react-data-table-component";
 import styled from "styled-components";
-
-import { useState, useMemo } from "react";
-
-
+import getData from "./getData";
+import { useState, useMemo, useEffect } from "react";
+import icondelete from '../assets/icondelete.svg'
 
 
 const TextField = styled.input`
@@ -28,20 +27,136 @@ const HeaderDiv = styled.div`
   flex-grow: 1;
 `;
 
+const Table = ({ data, setData }) => {
+
+  const [editModal, setEditModal] = useState(false);
+
+  useEffect(() => {
+    getData(setData)
+  }, []);
 
 
-const Table = () => {
- 
+  const [username, setUsername] = useState(null)
+  const [email, setEmail] = useState(null)
+  const [mob, setMob] = useState(null)
+  const [dob, setDob] = useState(null)
+  const [id, setId] = useState(null)
 
+
+  const handleEdit = (e) => {
+    setEditModal(true);
+    setUsername(e.username)
+    setEmail(e.email)
+    setMob(e.mob)
+    setDob(e.dob)
+    setId(e.id)
+
+
+
+  };
+  const handleUpdate = (e) => {
+
+    if (mob && mob.length > 10) alert('Phone number greate 10 digits! ')
+    if (username && email && mob && dob) {
+
+      const update = async () => {
+
+        try {
+
+          const savedUserResponse = await fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/update/${id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+
+              },
+              body: JSON.stringify({ username, email, mob, dob })
+            }
+          );
+          const responseData = await savedUserResponse.json();
+
+          console.log(responseData);
+
+          if (responseData.status === 200) {
+            alert('User Updated!')
+            getData(setData)
+            setEditModal(false)
+
+          }
+
+          else {
+
+            console.log(responseData.message);
+          }
+
+        } catch (error) {
+          console.log("Internal Server Error");
+        }
+
+      };
+
+      update()
+    }
+    else {
+      alert("Enter all the fields.")
+    }
+  };
+
+
+  const handleDelete = (e) => {
+    
+      const deleteUser = async () => {
+
+        try {
+
+          const savedUserResponse = await fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/delete/${e.id}`,
+            {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+
+              },
+              
+            }
+          );
+          const responseData = await savedUserResponse.json();
+
+          console.log(responseData);
+
+          if (responseData.status === 200) {
+            alert('User Deleted!')
+            getData(setData)
+
+          }
+
+          else {
+
+            console.log(responseData.message);
+          }
+
+        } catch (error) {
+          console.log("Internal Server Error");
+        }
+
+      };
+
+      deleteUser()
+    
+    
+  };
 
   function RenderUser({ data }) {
     const [name, setNameText] = useState("");
 
     const [resetPaginationToggle, setResetPaginationToggle] = useState(false);
 
-    const filteredItems = data.filter(
-      (item) =>
-        item.name.toLowerCase().includes(name.toLowerCase()) 
+    const filteredItems = data.filter((item) =>
+      item.username.toLowerCase().includes(name.toLowerCase()) ||
+      item.dob.toLowerCase().includes(name.toLowerCase()) ||
+      item.mob.toLowerCase().includes(name.toLowerCase()) ||
+      item.email.toLowerCase().includes(name.toLowerCase()) 
     );
 
     const subHeaderComponentMemo = useMemo(() => {
@@ -94,40 +209,41 @@ const Table = () => {
       },
     };
 
-
     const columns = [
-       
-        {
-          name: "Name",
-          selector: (d) => d.name,
-          sortable: true,
-        },
-      
-        {
-          name: "Mentorship Phase",
-          selector: (d) => d.phase,
-          sortable: true,
-        },
-        {
-          name: "Onboarding Stage",
-          selector: (d) => d.stage,
-          sortable: true,
-        },
-        {
-          name: "Delay in Days",
-          selector: (d) => d.delta_in_days,
-          sortable: true,
-        },
-        {
-          name: "Program",
-          selector: (d) => d.program,
-          sortable: true,
-        },
-      ];
+      {
+        name: "User name",
+        selector: (d) => d.username,
+        sortable: true,
+      },
+
+      {
+        name: "Email",
+        selector: (d) => d.email,
+        sortable: true,
+      },
+      {
+        name: "MOB",
+        selector: (d) => d.mob,
+        sortable: true,
+      },
+      {
+        name: "DOB",
+        selector: (d) => d.dob,
+        sortable: true,
+      },
+      {
+        name: "Action",
+        selector: (d) => {
+          return <div className="flex items-center justify-center gap-[10px]">
+            <button className="" onClick={() => handleEdit(d)}>edit</button>
+            <button onClick={()=>handleDelete(d)} > <img className="w-[20px]" src={icondelete} alt="" /> </button>
+
+          </div>
 
 
-
-      
+        },
+      },
+    ];
 
     return (
       <>
@@ -140,22 +256,71 @@ const Table = () => {
           subHeader
           subHeaderComponent={subHeaderComponentMemo}
         />
-        
       </>
     );
   }
 
-  const data = [
-    { id: 1, name: 'John', age: 30 },
-    { id: 2, name: 'Jane', age: 25 },
-    { id: 3, name: 'Alice', age: 35 },
-    // Add more data rows as needed
-  ];
-
+  // const data = [
+  //   { id: 1, name: 'John', age: 30 },
+  //   { id: 2, name: 'Jane', age: 25 },
+  //   { id: 3, name: 'Alice', age: 35 },
+  //   // Add more data rows as needed
+  // ];
 
   return (
     <div >
+      
+      
+
       <RenderUser data={data} />
+      {editModal && (
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="w-[30vw] h-[50vh] bg-white flex flex-col justify-around items-center rounded-lg">
+            <div className="w-[100%] h-[10px] text-center text-[18px] relative">Edit
+              <button onClick={() => setEditModal(false)} className="text-[20px] absolute right-5">X</button>
+            </div>
+            <input
+              placeholder="Enter username"
+              className="border p-[0.5rem] w-[90%]"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              name="username"
+            />
+            <input
+              placeholder="Enter email"
+              className="border p-[0.5rem] w-[90%]"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              name="username"
+            />
+            <input
+              placeholder="Enter phone number"
+              className="border p-[0.5rem] w-[90%]"
+              value={mob}
+              onChange={(e) => setMob(e.target.value)}
+              type="number"
+              name="username"
+            />
+            <input
+              placeholder="Enter DOB"
+              className="border p-[0.5rem] w-[90%]"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+              type="date"
+              name="username"
+            />
+            <button
+              className="border p-[0.5rem] w-[90%]"
+              type="submit"
+              onClick={handleUpdate}
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
