@@ -2,7 +2,11 @@
 import './App.css';
 import Table from './component/Table';
 import getData from './component/getData';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
+
+import {  toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function App() {
 
@@ -40,18 +44,19 @@ function App() {
   
             console.log(responseData);
     
-            if (responseData.status === 200) {
-              alert('User created!')
+            if (responseData.status === 201) {
+              
+              toast.success('User created!');
               getData(setData)
             }
             
             else{
              
-              console.log(responseData.message);
+              toast.error("Could not create the user, please try again.");
             }
           
         } catch (error) {
-          console.log("Internal Server Error");
+          toast.error("Could not create the user, please try again.");
         }
        
       };
@@ -65,12 +70,17 @@ function App() {
     }
   }
 
+useEffect(() => {
+  
+}, [])
 
 
 
 
 
   return (
+    <div className='w-[100vw] h-[100vh] '>
+  
     <div className='w-[100vw] h-[100vh] flex flex-col justify-center items-center gap-[10px]' >
       <div className='w-[70vw] h-[5vh] flex justify-between' >
 
@@ -81,13 +91,16 @@ function App() {
         <button className='border p-[0.5rem] px-[1rem]' type='submit' onClick={submit}>Submit</button>
       </div>
       <div className='w-[70vw] h-[60vh] border overflow-y-scroll' >
-        <Table data={data} setData={setData}/>
+        <Table data={data} setData={setData} />
       </div>
 
       
 
 
     </div>
+    
+    </div>
+    
   );
 }
 

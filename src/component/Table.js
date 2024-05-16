@@ -4,7 +4,8 @@ import styled from "styled-components";
 import getData from "./getData";
 import { useState, useMemo, useEffect } from "react";
 import icondelete from '../assets/icondelete.svg'
-
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const TextField = styled.input`
   height: 36px;
@@ -79,7 +80,7 @@ const Table = ({ data, setData }) => {
           console.log(responseData);
 
           if (responseData.status === 200) {
-            alert('User Updated!')
+            toast.success('User Updated!')
             getData(setData)
             setEditModal(false)
 
@@ -87,11 +88,11 @@ const Table = ({ data, setData }) => {
 
           else {
 
-            console.log(responseData.message);
+            toast.error("Could not update the user, please try again.");
           }
 
         } catch (error) {
-          console.log("Internal Server Error");
+          toast.error("Could not update the user, please try again.");
         }
 
       };
@@ -99,7 +100,7 @@ const Table = ({ data, setData }) => {
       update()
     }
     else {
-      alert("Enter all the fields.")
+      toast.error("Enter all the fields");
     }
   };
 
@@ -126,18 +127,18 @@ const Table = ({ data, setData }) => {
           console.log(responseData);
 
           if (responseData.status === 200) {
-            alert('User Deleted!')
+            toast.success("User Deleted");
             getData(setData)
 
           }
 
           else {
 
-            console.log(responseData.message);
+            toast.error("Could not delete the user, please try again.");
           }
 
         } catch (error) {
-          console.log("Internal Server Error");
+          toast.error("Could not delete the user, please try again.");
         }
 
       };
@@ -268,11 +269,8 @@ const Table = ({ data, setData }) => {
   // ];
 
   return (
-    <div >
-      
-      
-
-      <RenderUser data={data} />
+  <>
+  <RenderUser data={data} />
       {editModal && (
         <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="w-[30vw] h-[50vh] bg-white flex flex-col justify-around items-center rounded-lg">
@@ -321,7 +319,8 @@ const Table = ({ data, setData }) => {
           </div>
         </div>
       )}
-    </div>
+  </>
+   
   );
 };
 
