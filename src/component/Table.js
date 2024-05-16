@@ -178,7 +178,7 @@ const Table = ({ data, setData }) => {
               <TextField
                 id="search"
                 type="text"
-                placeholder="Filter By Name, Email, Designation, Role"
+                placeholder="Filter By Name, Email, DOB, Phone number"
                 aria-label="Search Input"
                 onChange={(e) => setNameText(e.target.value)}
                 style={{ fontSize: "14px" }}
