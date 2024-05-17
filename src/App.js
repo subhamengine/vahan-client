@@ -80,6 +80,7 @@ useEffect(() => {
 
   return (
     <div className='w-[100vw] h-[100vh] '>
+      <p className='absolute left-10 top-10 text-[10px]'> Note: The backend is hosted on render.com (free). <br /> It could take a while to load the data. <br /> Please refresh 2-3 times and wait for 30 seconds.</p>
   
     <div className='w-[100vw] h-[100vh] flex flex-col justify-center items-center gap-[10px]' >
       <div className='w-[70vw] h-[5vh] flex justify-between' >
